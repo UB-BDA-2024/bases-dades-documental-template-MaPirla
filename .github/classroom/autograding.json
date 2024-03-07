@@ -1,0 +1,54 @@
+{
+  "tests": [
+    {
+      "name": "Test_redis_connection",
+      "setup": "docker-compose up -d",
+      "run": "docker exec bdda_api sh -c \"pytest -k test_redis_connection\"",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 2
+    },
+    {
+      "name": "test_post_sensor_data",
+      "setup": "docker-compose up -d",
+      "run": "docker exec bdda_api sh -c \"pytest -k test_post_sensor_data\"",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 2
+    },
+    {
+      "name": "test_get_sensor_data",
+      "setup": "docker-compose up -d",
+      "run": "docker exec bdda_api sh -c \"pytest -k test_get_sensor_data\"",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 2
+    },
+    {
+      "name": " test_post_sensor_data_not_exists",
+      "setup": "docker-compose up -d",
+      "run": "docker exec bdda_api sh -c \"pytest -k  test_post_sensor_data_not_exists\"",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 2
+    },
+    {
+      "name": "test_get_sensor_data_not_exists",
+      "setup": "docker-compose up -d",
+      "run": "docker exec bdda_api sh -c \"pytest -k test_get_sensor_data_not_exists\"",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 2
+    }
+  ]
+}
