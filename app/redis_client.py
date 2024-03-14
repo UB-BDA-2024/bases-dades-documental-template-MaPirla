@@ -5,7 +5,7 @@ class RedisClient:
         self._host = host
         self._port = port
         self._db = db
-        self._client = redis.Redis(host=self._host, port=self._port, db=self._db)
+        self._client = redis.Redis(host=self._host, port=self._port, db=self._db, decode_responses=True)
     
     def close(self):
         self._client.close()

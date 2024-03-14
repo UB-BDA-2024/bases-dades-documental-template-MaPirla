@@ -6,18 +6,17 @@ class Sensor(BaseModel):
     name: str
     latitude: float
     longitude: float
-    joined_at: str
+    joined_at: str | None
     last_seen: str
     type: str
-    mac_address: str
+    mac_address: str | None
     battery_level: float
     temperature: float | None
     humidity: float | None
     velocity: float | None
     
     
-    class Config:
-        orm_mode = True
+    
         
 class SensorCreate(BaseModel):
     name: str
@@ -31,8 +30,8 @@ class SensorCreate(BaseModel):
     firmware_version: str
 
 class SensorData(BaseModel):
-    velocity: float
-    temperature: float
-    humidity: float
+    velocity: float | None
+    temperature: float | None
+    humidity: float | None
     battery_level: float
     last_seen: str
