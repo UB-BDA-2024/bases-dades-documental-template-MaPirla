@@ -69,10 +69,14 @@ def get_data(redis: Session, db: Session, sensor_id: int) -> schemas.Sensor:
     )
     return sensor
 
-def delete_sensor(db: Session, sensor_id: int):
+def delete_sensor(db: Session,redis:RedisClient, mongodb:MongoDBClient, sensor_id: int):
     db_sensor = db.query(models.Sensor).filter(models.Sensor.id == sensor_id).first()
     if db_sensor is None:
         raise HTTPException(status_code=404, detail="Sensor not found")
+    mongodb.getDatabase('MongoDB_')
+    mongodb.getCollection('sensor')
+    mongodb.collection.delete_one({"id_sensor": sensor_id})
+    # delete from posgreSQL
     db.delete(db_sensor)
     db.commit()
     return db_sensor
