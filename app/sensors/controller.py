@@ -41,9 +41,10 @@ router = APIRouter(
 
 # 🙋🏽‍♀️ Add here the route to get a list of sensors near to a given location
 @router.get("/near")
-def get_sensors_near(latitude: float, longitude: float, db: Session = Depends(get_db),mongodb_client: MongoDBClient = Depends(get_mongodb_client)):
-    raise HTTPException(status_code=404, detail="Not implemented")
-    #return repository.get_sensors_near(mongodb=mongodb_client, latitude=latitude, longitude=longitude)
+def get_sensors_near(latitude: float, longitude: float, radius: int, db: Session = Depends(get_db),redis_client = Depends(get_redis_client), mongodb_client: MongoDBClient = Depends(get_mongodb_client)):
+    #raise HTTPException(status_code=404, detail="Not implemented")
+    return repository.get_sensors_near(mongodb = mongodb_client, db=db, redis=redis_client, latitude=latitude, longitude=longitude, radius=radius)
+
 
 
 # 🙋🏽‍♀️ Add here the route to get all sensors
@@ -58,7 +59,7 @@ def create_sensor(sensor: schemas.SensorCreate, db: Session = Depends(get_db), m
     db_sensor = repository.get_sensor_by_name(db, sensor.name)
     if db_sensor:
         raise HTTPException(status_code=400, detail="Sensor with same name already registered")
-    return repository.create_sensor(db=db, sensor=sensor)
+    return repository.create_sensor(db=db, mongodb=mongodb_client,sensor=sensor)
 
 # 🙋🏽‍♀️ Add here the route to get a sensor by id
 @router.get("/{sensor_id}")

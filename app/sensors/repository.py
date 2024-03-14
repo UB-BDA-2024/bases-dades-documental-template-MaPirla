@@ -2,6 +2,9 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from typing import List, Optional
 
+from app.mongodb_client import MongoDBClient
+from app.redis_client import RedisClient
+
 from . import models, schemas
 from app import sensors
 
@@ -14,11 +17,27 @@ def get_sensor_by_name(db: Session, name: str) -> Optional[models.Sensor]:
 def get_sensors(db: Session, skip: int = 0, limit: int = 100) -> List[models.Sensor]:
     return db.query(models.Sensor).offset(skip).limit(limit).all()
 
-def create_sensor(db: Session, sensor: schemas.SensorCreate) -> models.Sensor:
+def create_sensor(db: Session,mongodb: Session, sensor: schemas.SensorCreate) -> models.Sensor:
     db_sensor = models.Sensor(name=sensor.name, latitude=sensor.latitude, longitude=sensor.longitude)
     db.add(db_sensor)
     db.commit()
     db.refresh(db_sensor)
+    sensor_json = {
+        "id_sensor": db_sensor.id,
+        "type": sensor.type,
+        "mac_address": sensor.mac_address,
+        "manufacturer": sensor.manufacturer,
+        "model": sensor.model,
+        "serie_number": sensor.serie_number,
+        "firmware_version": sensor.firmware_version,
+        "location": {
+            "type": "Point",
+            "coordinates": [sensor.longitude, sensor.latitude]
+        }
+    }
+    mongodb.getDatabase("MongoDB_")
+    collection = mongodb.getCollection("sensor")
+    collection.insert_one(sensor_json)
     return db_sensor
 
 def record_data(redis: Session, sensor_id: int, data: schemas.SensorData) -> schemas.Sensor:
@@ -57,3 +76,25 @@ def delete_sensor(db: Session, sensor_id: int):
     db.delete(db_sensor)
     db.commit()
     return db_sensor
+
+def get_sensors_near(mongodb: MongoDBClient, db: Session, redis:RedisClient, latitude: float, longitude: float, radius: int):
+    mongodb.getDatabase("MongoDB_")
+    collection = mongodb.getCollection("sensor")
+    collection.create_index([("location", "2dsphere")])
+
+    query = {
+        "location": {
+            "$nearSphere": {
+                "$geometry": {"type": "Point", "coordinates": [longitude, latitude]},
+                "$maxDistance": radius  
+            }
+        }
+    }
+
+    near_sensors = list(collection.find(query))
+    print(near_sensors)
+    sensors = []
+    for sensor in near_sensors:
+        sensors.append(get_data(db=db,redis=redis, sensor_id=sensor["id_sensor"]))
+    print(sensors)
+    return sensors
