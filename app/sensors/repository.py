@@ -25,11 +25,6 @@ def create_sensor(db: Session,mongodb: Session, sensor: schemas.SensorCreate) ->
     sensor_json = {
         "id_sensor": db_sensor.id,
         "type": sensor.type,
-        "mac_address": sensor.mac_address,
-        "manufacturer": sensor.manufacturer,
-        "model": sensor.model,
-        "serie_number": sensor.serie_number,
-        "firmware_version": sensor.firmware_version,
         "location": {
             "type": "Point",
             "coordinates": [sensor.longitude, sensor.latitude]
